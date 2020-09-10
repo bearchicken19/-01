@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        canvas{
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+<canvas id="can" ></canvas>
+</body>
+</html>
+<script src="js/jiazai.js"></script>
+<script src="js/sky.js"></script>
+<script src="js/bird.js"></script>
+<script src="js/land.js"></script>
+<script src="js/pipe.js"></script>
+<script src="js/gamescreen.js"></script>
+<script src="js/gameover.js"></script>
+<script>
+    var cas = document.querySelector('#can');
+    var ctx = cas.getContext('2d');
+    jiazai({bird:'img/bird.png',
+        land:'img/land.png',
+        pipedowm:'img/pipeDown.png',
+        pipeup:'img/pipeUp.png',
+        sky:'img/sky.png'
+    },function (obj) {
+        // 在这里把画布的大小赋值为sky图片的大小
+        cas.width = obj.sky.width;
+        cas.height = obj.sky.height;
+        var gamescreen = new Gamescreen(ctx,obj);
+        var gameover = new Gameover(ctx);
+
+        var timer = setInterval(function () {
+            gamescreen.draw();
+            // 在这里判断每次小鸟绘制的时候中心点是否在管道路径中，如果在就清除定时器，游戏结束
+            // 同时还要判断小鸟的y轴坐标是否小于0或者大于画布的高减去大地的高，如果是，同样清除定时器
+            var bird = getBird(ctx,obj.bird,3,20,20);
+            var birdX = bird.x + bird.width/2;
+            var birdY = bird.y + bird.height/2;
+            if (ctx.isPointInPath(birdX,birdY) ||
+                bird.y <= 0 || bird.y >= ctx.canvas.height-obj.land.height
+            ){
+                clearInterval(timer);
+                gameover.draw();
+            }
+        },100)
+    })
+</script>
